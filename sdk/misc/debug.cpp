@@ -26,9 +26,30 @@ void sdk::debug::free_console()
 #endif
 }
 
-void sdk::debug::print(const std::string str)
+void sdk::debug::print(const std::string& str)
 {
 #ifdef DEBUG
 	std::cout << "[+] " << str << "\n";
+#endif
+}
+
+void sdk::debug::print_address(const std::string& title, uintptr_t address, bool is_offset)
+{
+#ifdef DEBUG
+	if (is_offset)
+		std::cout << "[+] Found " << title << " at offset 0x" << std::hex << address << "\n";
+	else
+		std::cout << "[+] Found " << title << " at 0x" << std::hex << address << "\n";
+#endif
+}
+
+void sdk::debug::error(const std::string& message)
+{
+#ifdef DEBUG
+	std::cout << "[-] Error: " << message << "\n";
+	
+	// Wait for uninjection
+	while (true)
+		Sleep(1000);
 #endif
 }

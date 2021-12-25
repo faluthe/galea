@@ -45,6 +45,30 @@
     <ClCompile Include="hooks\minhook\hde\hde64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\bunnyhop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\classes\entity\player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\globals\globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\autopistol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\classes\entity\entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\classes\rendering\font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\configuration\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\misc\helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sdk\interfaces\interfaces.h">
@@ -90,6 +114,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hooks\minhook\hde\table64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\entity\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\entity\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IClientEntityList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IVEngineClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\CUserCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\features.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\globals\globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\entity\weapon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\math\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\ISurface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\rendering\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\classes\rendering\color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\configuration\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,7 +6,7 @@ private:
 	void* pInterface;
 public:
 	Hook(void* pInterface) : pInterface{ pInterface } {}
-	void hook_function(unsigned short index, void* hkFunc, void* oFunc);
+	void hook_function(unsigned short index, void* hkFunc, void** oFunc);
 };
 
 namespace hooks

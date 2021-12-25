@@ -8,7 +8,9 @@ namespace sdk
 	{
 		void create_console();
 		void free_console();
-		void print(const std::string str);
+		void print(const std::string& str);
+		void print_address(const std::string& title, const uintptr_t address, bool is_offset = false);
+		void error(const std::string& message);
 	}
 
 	namespace helpers

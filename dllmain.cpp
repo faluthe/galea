@@ -2,8 +2,9 @@
 #include <stdexcept>
 #include <Windows.h>
 
-#include "hooks/hooks.h"
+#include "core/configuration/config.h"
 #include "sdk/interfaces/interfaces.h"
+#include "hooks/hooks.h"
 #include "sdk/sdk.h"
 
 DWORD WINAPI init(HMODULE hModule)
@@ -27,7 +28,8 @@ DWORD WINAPI init(HMODULE hModule)
         MessageBoxA(NULL, e.what(), NULL, MB_OK | MB_ICONWARNING);
     }
 
-    while (!(GetAsyncKeyState(VK_END) & 1))
+    // This infinite loop will run even if an exception is caught
+    while (!(GetAsyncKeyState(config::panic_button) & 1))
         Sleep(1000);
 
     try
