@@ -11,6 +11,8 @@ public:
 
 namespace hooks
 {
+	inline void(__fastcall* oDrawModelExecute)(void*, void*, void*, const ModelRenderInfo_t&, const ModelRenderInfo_t&, void*);
+
 	void init();
 	void restore_all();
 }

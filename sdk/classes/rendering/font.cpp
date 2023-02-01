@@ -24,3 +24,12 @@ void Font::setup(int tall, int weight, int flags, const char* windows_font_name)
 
 	sdk::debug::print("Font height: " + std::to_string(height) + " pixels");
 }
+
+int Font::text_width(const std::wstring& text)
+{
+	int width, temp{};
+
+	ifaces::surface->GetTextSize(HFont, text.c_str(), width, temp);
+
+	return width;
+}

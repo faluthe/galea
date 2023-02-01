@@ -69,6 +69,9 @@
     <ClCompile Include="sdk\misc\helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\chams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sdk\interfaces\interfaces.h">
@@ -156,6 +159,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\configuration\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IVModelRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IStudioRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="valve\IMaterialSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

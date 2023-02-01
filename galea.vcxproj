@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClCompile Include="core\autopistol.cpp" />
     <ClCompile Include="core\bunnyhop.cpp" />
+    <ClCompile Include="core\chams.cpp" />
     <ClCompile Include="core\configuration\config.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="hooks\hooks.cpp" />
@@ -198,9 +199,13 @@
     <ClInclude Include="valve\CUserCmd.h" />
     <ClInclude Include="valve\IBaseClientDLL.h" />
     <ClInclude Include="valve\IClientEntityList.h" />
+    <ClInclude Include="valve\IMaterial.h" />
+    <ClInclude Include="valve\IMaterialSystem.h" />
     <ClInclude Include="valve\IPanel.h" />
+    <ClInclude Include="valve\IStudioRender.h" />
     <ClInclude Include="valve\ISurface.h" />
     <ClInclude Include="valve\IVEngineClient.h" />
+    <ClInclude Include="valve\IVModelRender.h" />
     <ClInclude Include="valve\Recv.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

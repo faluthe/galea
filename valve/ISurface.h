@@ -2,6 +2,8 @@
 
 // See: https://github.com/faluthe/cstrike15_src/blob/master/public/vgui/ISurface.h
 
+#include <functional>
+
 #include "../sdk/classes/rendering/color.h"
 #include "../sdk/sdk.h"
 
@@ -17,6 +19,7 @@ struct ISurface
 			int blur, int scanlines, int flags),
 		(this, font, windowsFontName, tall, weight, blur, scanlines, flags, 0, 0))
 	VIRTUAL_METHOD(int, GetFontTall, 74, (unsigned long font), (this, font))
+	VIRTUAL_METHOD(void, GetTextSize, 79, (unsigned font, const wchar_t* text, int& wide, int& tall), (this, font, text, std::ref(wide), std::ref(tall)))
 
 	void DrawSetTextColor(const Color& color)
 	{

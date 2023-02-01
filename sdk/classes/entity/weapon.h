@@ -21,10 +21,10 @@ enum class WeaponType
 
 struct Weapon : Entity
 {
-	VIRTUAL_METHOD(WeaponType, weapon_type, 455, (), (this))
+	VIRTUAL_METHOD(WeaponType, GetWeaponType, 455, (), (this))
 
 	bool is_pistol()
 	{
-		return weapon_type() == WeaponType::Pistol;
+		return GetWeaponType() == WeaponType::Pistol;
 	}
 };

@@ -1,4 +1,5 @@
-#pragma warning(disable : 4100) // Disable "lpReserved unreferenced formal parameter" warning
+// Disable "lpReserved unreferenced formal parameter" warning
+#pragma warning(disable : 4100)
 #include <stdexcept>
 #include <Windows.h>
 

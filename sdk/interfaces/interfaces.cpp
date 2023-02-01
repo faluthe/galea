@@ -23,11 +23,15 @@ void ifaces::init()
 	const auto client_dll = GetModuleHandleA("client.dll");
 	const auto engine_dll = GetModuleHandleA("engine.dll");
 
+	// All interfaces (except client_mode) are checked
 	client = get_interface<IBaseClientDLL>(client_dll, "VClient018");
 	client_mode = **reinterpret_cast<void***>((*reinterpret_cast<uintptr_t**>(client))[0xA] + 0x5);
 	engine = get_interface<IVEngineClient>(engine_dll, "VEngineClient014");
 	entity_list = get_interface<IClientEntityList>(client_dll, "VClientEntityList003");
+	mat_sys = get_interface<IMaterialSystem>(GetModuleHandleA("materialsystem.dll"), "VMaterialSystem080");
+	mdl_render = get_interface<IVModelRender>(engine_dll, "VEngineModel016");
 	panel = get_interface<IPanel>(GetModuleHandleA("vgui2.dll"), "VGUI_Panel009");
+	studio_render = get_interface<IStudioRender>(GetModuleHandleA("studiorender.dll"), "VStudioRender026");
 	surface = get_interface<ISurface>(GetModuleHandleA("vguimatsurface.dll"), "VGUI_Surface031");
 
 	sdk::debug::print("Interfaces initialized");
