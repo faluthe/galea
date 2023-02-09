@@ -11,4 +11,5 @@ struct IVEngineClient
 	VIRTUAL_METHOD(void, GetScreenSize, 5, (int& width, int& height), (this, std::ref(width), std::ref(height)))
 	// Returns index of localplayer in entity list
 	VIRTUAL_METHOD(int, GetLocalPlayer, 12, (), (this))
+	VIRTUAL_METHOD(int, GetMaxClients, 20, (), (this))
 };

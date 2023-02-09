@@ -27,16 +27,13 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 	// Remember, this function is only called in game!
 	static bool hooked = []() { sdk::debug::print("CreateMove hooked"); return true; } ();
 
-	if (cmd == nullptr || cmd->command_number == 0)
-		return oCreateMove(sampletime, cmd);
+	// Causing issues
+	/*if (cmd == nullptr || cmd->command_number == 0)
+		return oCreateMove(sampletime, cmd);*/
 
-	// Should this be called each time createmove is called?
-	static bool bLocal = []() { g::get_localplayer(); return true; } ();
 
-	if (GetAsyncKeyState(VK_HOME) & 1)
-	{
-		// Runtime tests go here
-	}
+
+	g::get_localplayer();
 
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);

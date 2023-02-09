@@ -8,7 +8,7 @@ void g::get_localplayer()
 	localplayer = ifaces::entity_list->GetClientEntity<Player>(ifaces::engine->GetLocalPlayer());
 	
 	if (localplayer)
-		sdk::debug::print_address("localplayer", reinterpret_cast<uintptr_t>(localplayer));
+		static bool once = []() { sdk::debug::print_address("localplayer", reinterpret_cast<uintptr_t>(localplayer)); return true; } ();
 }
 
 void g::get_screen_size()

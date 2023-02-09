@@ -2,6 +2,7 @@
 
 #include "../../valve/IBaseClientDLL.h"
 #include "../../valve/IClientEntityList.h"
+#include "../../valve/ICvar.h"
 #include "../../valve/IMaterialSystem.h"
 #include "../../valve/IPanel.h"
 #include "../../valve/IStudioRender.h"
@@ -11,8 +12,11 @@
 
 namespace ifaces
 {
+	/* 'inline' tells the compiler to only create one instance of the variable
+	   even if the header file is included in multiple source files */
 	inline IBaseClientDLL* client{};
 	inline void* client_mode{};
+	inline ICvar* cvar{};
 	inline IVEngineClient* engine{};
 	inline IClientEntityList* entity_list{};
 	inline IMaterialSystem* mat_sys{};

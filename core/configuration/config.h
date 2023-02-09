@@ -9,7 +9,7 @@ namespace config
 	void render();
 	void render_watermark();
 
-	constexpr int menu_button{ VK_DELETE };
+	constexpr int menu_button{ VK_INSERT };
 	constexpr int panic_button{ VK_END };
 
 	inline bool autopistol{ false };

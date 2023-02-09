@@ -26,6 +26,7 @@ void ifaces::init()
 	// All interfaces (except client_mode) are checked
 	client = get_interface<IBaseClientDLL>(client_dll, "VClient018");
 	client_mode = **reinterpret_cast<void***>((*reinterpret_cast<uintptr_t**>(client))[0xA] + 0x5);
+	cvar = cvar = get_interface<ICvar>(GetModuleHandleA("vstdlib.dll"), "VEngineCvar007");
 	engine = get_interface<IVEngineClient>(engine_dll, "VEngineClient014");
 	entity_list = get_interface<IClientEntityList>(client_dll, "VClientEntityList003");
 	mat_sys = get_interface<IMaterialSystem>(GetModuleHandleA("materialsystem.dll"), "VMaterialSystem080");
