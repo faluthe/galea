@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "../sdk/classes/math/matrix.h"
 #include "../sdk/classes/entity/player.h"
 #include "../sdk/globals/globals.h"
 #include "../sdk/interfaces/interfaces.h"
@@ -31,12 +32,11 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 	/*if (cmd == nullptr || cmd->command_number == 0)
 		return oCreateMove(sampletime, cmd);*/
 
-
-
 	g::get_localplayer();
 
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);
+	features::backtrack::update_records();
 
 	// Remove crouch delay
 	cmd->buttons |= CUserCmd::IN_BULLRUSH;
@@ -44,7 +44,7 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 	return false;
 }
 
-static void __fastcall hkDrawModelExecute(void* _this, void* _edx, void* pRenderContext, const ModelRenderInfo_t& state, const ModelRenderInfo_t& pInfo, void* pCustomBoneToWorld)
+static void __fastcall hkDrawModelExecute(void* _this, void* _edx, void* pRenderContext, const ModelRenderInfo_t& state, const ModelRenderInfo_t& pInfo, Matrix3x4* pCustomBoneToWorld)
 {
 	static bool hooked = []() { sdk::debug::print("DrawModelExecute hooked"); return true; } ();
 

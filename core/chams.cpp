@@ -3,6 +3,7 @@
 #include "../core/configuration/config.h"
 #include "../sdk/classes/rendering/color.h"
 #include "../sdk/classes/entity/player.h"
+#include "../sdk/classes/math/matrix.h"
 #include "../sdk/globals/globals.h"
 #include "../sdk/interfaces/interfaces.h"
 #include "../hooks/hooks.h"
@@ -27,7 +28,7 @@ static void render(IMaterial* material, const Color& color, bool ignore_z)
 	ifaces::studio_render->ForcedMaterialOverride(material);
 }
 
-void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelRenderInfo_t& state, const ModelRenderInfo_t& pInfo, void* pCustomBoneToWorld)
+void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelRenderInfo_t& state, const ModelRenderInfo_t& pInfo, Matrix3x4* pCustomBoneToWorld)
 {
 	if (!config::chams || !g::localplayer->valid_ptr() || pInfo.pModel == nullptr)
 		return;

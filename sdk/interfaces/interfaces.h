@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../valve/CGlobalVarsBase.h"
 #include "../../valve/IBaseClientDLL.h"
 #include "../../valve/IClientEntityList.h"
 #include "../../valve/ICvar.h"
@@ -19,6 +20,7 @@ namespace ifaces
 	inline ICvar* cvar{};
 	inline IVEngineClient* engine{};
 	inline IClientEntityList* entity_list{};
+	inline CGlobalVarsBase* global_vars{};
 	inline IMaterialSystem* mat_sys{};
 	inline IVModelRender* mdl_render{};
 	inline IPanel* panel{};

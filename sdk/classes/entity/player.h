@@ -2,6 +2,7 @@
 
 #include "../../sdk.h"
 #include "../../netvars/netvars.h"
+#include "../math/vector.h"
 #include "entity.h"
 #include "weapon.h"
 
