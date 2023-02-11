@@ -10,6 +10,7 @@ namespace features
 	{
 		void update_records();
 		void run(CUserCmd* cmd);
+		bool valid_tick(float simtime);
 	}
 
 	void autopistol(CUserCmd* cmd);

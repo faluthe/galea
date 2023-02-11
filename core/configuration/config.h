@@ -18,7 +18,8 @@ namespace config
 
 	namespace colors
 	{
-		constexpr Color enemy_hidden{ 0x00, 0x00, 0x00 };
-		constexpr Color enemy_visible{ 0xFF, 0x5F, 0x15 };
+		constexpr Color enemy_hidden{ 0x04, 0x74, 0xBA };
+		constexpr Color enemy_visible{ 0xF3, 0x69, 0x17 };
+		constexpr Color interp_ticks{ 0xFF, 0xFF, 0xFF, 0x7F };
 	}
 }

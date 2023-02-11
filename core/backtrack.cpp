@@ -7,6 +7,8 @@
 #include "../valve/ConVar.h"
 #include "features.h"
 
+// Good resource: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
+
 struct Cvars
 {
 	ConVar* updaterate;
@@ -39,12 +41,43 @@ Cvars init_cvars()
 
 int time_to_ticks(float time)
 {
-
+	return static_cast<int>(0.5f + time / ifaces::global_vars->interval_per_tick);
 }
 
-bool valid_tick(float simtime)
+// Get interpolation period (time between rendering time and real time)
+float lerp(const Cvars& cvars)
 {
+	// READ THIS: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking#Entity_interpolation
+	auto min = cvars.min_interp_ratio->GetFloat();
+	auto max = cvars.max_interp_ratio->GetFloat();
+	auto ratio = std::clamp(cvars.interp_ratio->GetFloat(), min, max);
+	auto rate = cvars.maxupdaterate ? cvars.maxupdaterate->GetFloat() : cvars.updaterate->GetFloat();
+	return (std::max)(cvars.interp->GetFloat(), ratio / rate);
+}
 
+// simtime is the potential command execution time (aka where the players would be moved back to during lag comp)
+bool features::backtrack::valid_tick(float simtime)
+{
+	static Cvars cvars = init_cvars();
+	
+	auto nci = ifaces::engine->GetNetChannelInfo();
+	if (!nci)
+		return false;
+
+	// Get your ping
+	float outgoing = nci->GetLatency(0);
+	float incoming = nci->GetLatency(1);
+	// Get the maximum amount of time the server will rewind
+	float unlag = cvars.maxunlag->GetFloat();
+	float server_time = ifaces::global_vars->curtime;
+
+	// How long its been since the tick occured and now
+	auto time_delta = server_time - simtime;
+	// Difference between the max rewind time and the tick to check
+	auto delta = std::clamp(incoming + outgoing + lerp(cvars), 0.0f, unlag) - time_delta;
+
+	// Only care about ticks that are x seconds, or less, newer 
+	return std::abs(delta) <= 0.2f;
 }
 
 // Updates g::lagcomp_records
@@ -83,7 +116,7 @@ void features::backtrack::update_records()
 		g::lagcomp_records[i].push_front(record);
 
 		// Store between 3 ticks and 200 milliseconds worth of ticks
-		while (g::lagcomp_records[i].size() > 3 && g::lagcomp_records[i].size() > time_to_ticks(0.2f))
+		while (g::lagcomp_records[i].size() > 3 && g::lagcomp_records[i].size() > static_cast<size_t>(time_to_ticks(0.2f)))
 			g::lagcomp_records[i].pop_back();
 
 		auto rstart = std::cbegin(g::lagcomp_records[i]);

@@ -10,4 +10,6 @@ struct ConVar
 {
 	std::byte pad0[12];
 	const char* name;
+
+	VIRTUAL_METHOD(float, GetFloat, 12, (), (this))
 };

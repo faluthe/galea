@@ -37,7 +37,7 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 	{
 		const auto ent = ifaces::entity_list->GetClientEntity<Player>(pInfo.entity_index);
 
-		if (!ent->valid_ptr() || !ent->is_alive() || ent == g::localplayer)
+		if (!ent->valid_ptr() || ent->is_dormant() || !ent->is_alive() || ent == g::localplayer)
 			return;
 
 		static auto player_material = setup_material();
@@ -46,6 +46,19 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 		{
 			render(player_material, config::colors::enemy_hidden, true);
 			hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, pCustomBoneToWorld);
+
+			int index = ent->ent_list_index();
+
+			if (!g::lagcomp_records[index].empty())
+			{
+				for (auto& record : g::lagcomp_records[index])
+				{
+					if (!features::backtrack::valid_tick(record.sim_time) || record.bone_matrix == nullptr)
+						continue;
+					render(player_material, config::colors::interp_ticks, false);
+					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record.bone_matrix);
+				}
+			}
 
 			render(player_material, config::colors::enemy_visible, false);
 		}
