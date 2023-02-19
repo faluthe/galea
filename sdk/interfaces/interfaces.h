@@ -8,6 +8,7 @@
 #include "../../valve/IPanel.h"
 #include "../../valve/IStudioRender.h"
 #include "../../valve/ISurface.h"
+#include "../../valve/IVDebugOverlay.h"
 #include "../../valve/IVEngineClient.h"
 #include "../../valve/IVModelRender.h"
 
@@ -18,6 +19,7 @@ namespace ifaces
 	inline IBaseClientDLL* client{};
 	inline void* client_mode{};
 	inline ICvar* cvar{};
+	inline IVDebugOverlay* debug_overlay{};
 	inline IVEngineClient* engine{};
 	inline IClientEntityList* entity_list{};
 	inline CGlobalVarsBase* global_vars{};

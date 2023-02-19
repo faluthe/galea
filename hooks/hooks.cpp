@@ -37,6 +37,7 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);
 	features::backtrack::update_records();
+	features::backtrack::run(cmd);
 
 	// Remove crouch delay
 	cmd->buttons |= CUserCmd::IN_BULLRUSH;
@@ -76,6 +77,7 @@ static void __stdcall hkPaintTraverse(unsigned int vguiPanel, bool forceRepaint,
 		
 		config::render();
 		config::render_watermark();
+		features::test_esp();
 	}
 }
 

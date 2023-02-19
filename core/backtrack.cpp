@@ -5,6 +5,7 @@
 #include "../sdk/globals/globals.h"
 #include "../sdk/interfaces/interfaces.h"
 #include "../valve/ConVar.h"
+#include "../valve/CUserCmd.h"
 #include "features.h"
 
 // Good resource: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
@@ -128,4 +129,76 @@ void features::backtrack::update_records()
 		if (invalid_tick != rend)
 			g::lagcomp_records[i].erase(invalid_tick, rend);
 	}
+}
+
+void features::backtrack::run(CUserCmd* cmd)
+{
+	if (!g::localplayer->valid_ptr() || !g::localplayer->is_alive())
+		return;
+
+	float best_fov = FLT_MAX;
+	float best_dist = FLT_MAX;
+	int best_index = 0;
+	int best_record = 0;
+	Player* best_target = nullptr;
+
+	for (int i = 1; i < ifaces::engine->GetMaxClients(); i++)
+	{
+		auto ent = ifaces::entity_list->GetClientEntity<Player>(i);
+
+		if (!ent || !ent->is_alive() || ent->is_dormant() || ent->team() == g::localplayer->team())
+			continue;
+
+		auto head_pos = ent->hitbox_pos(8);
+		Vector pos_2d;
+		if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
+			continue;
+		auto d_x = (pos_2d.x - g::screen_center_x) * (pos_2d.x - g::screen_center_x);
+		auto d_y = (pos_2d.y - g::screen_center_y) * (pos_2d.y - g::screen_center_y);
+		auto fov = std::sqrt(d_x + d_y);
+
+		if (fov < best_fov)
+		{
+			best_fov = fov;
+			best_target = ent;
+			best_index = i;
+			features::backtrack::target = i;
+		}
+	}
+
+	if (best_target != nullptr)
+	{
+		if (g::lagcomp_records[best_index].size() <= 3)
+			return;
+
+		best_fov = FLT_MAX;
+
+		for (size_t i = 0; i < g::lagcomp_records[best_index].size(); i++)
+		{
+			auto record = &g::lagcomp_records[best_index][i];
+			if (!record || !valid_tick(record->sim_time))
+				continue;
+
+			Matrix3x4 m = record->bone_matrix[8];
+			Vector head_pos{ m[0][3], m[1][3], m[2][3] };
+			Vector pos_2d;
+			if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
+				continue;
+			auto d_x = (pos_2d.x - g::screen_center_x) * (pos_2d.x - g::screen_center_x);
+			auto d_y = (pos_2d.y - g::screen_center_y) * (pos_2d.y - g::screen_center_y);
+			auto fov = std::sqrt(d_x + d_y);
+
+			if (fov < best_fov)
+			{
+				best_fov = fov;
+				best_record = i;
+				features::backtrack::record = i;
+			}
+		}
+	}
+
+	static Cvars cvars = init_cvars();
+
+	if (best_record > 0 && cmd->buttons & CUserCmd::IN_ATTACK)
+		cmd->tick_count = time_to_ticks(g::lagcomp_records[best_index][best_record].sim_time); // +lerp(cvars));
 }

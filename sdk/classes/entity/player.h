@@ -25,4 +25,5 @@ struct Player : Entity
 	
 	Weapon* active_weapon();
 	bool is_alive();
+	Vector hitbox_pos(int id);
 };

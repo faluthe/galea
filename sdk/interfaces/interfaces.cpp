@@ -26,7 +26,8 @@ void ifaces::init()
 	// All interfaces (except client_mode) are checked
 	client = get_interface<IBaseClientDLL>(client_dll, "VClient018");
 	client_mode = **reinterpret_cast<void***>((*reinterpret_cast<uintptr_t**>(client))[0xA] + 0x5);
-	cvar = cvar = get_interface<ICvar>(GetModuleHandleA("vstdlib.dll"), "VEngineCvar007");
+	cvar = get_interface<ICvar>(GetModuleHandleA("vstdlib.dll"), "VEngineCvar007");
+	debug_overlay = get_interface<IVDebugOverlay>(engine_dll, "VDebugOverlay004");
 	engine = get_interface<IVEngineClient>(engine_dll, "VEngineClient014");
 	entity_list = get_interface<IClientEntityList>(client_dll, "VClientEntityList003");
 	global_vars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0xB] + 0xA);

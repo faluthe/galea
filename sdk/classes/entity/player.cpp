@@ -19,3 +19,16 @@ Weapon* Player::active_weapon()
 	auto weapon = *reinterpret_cast<uintptr_t*>(this + offset) & 0xFFF;
 	return ifaces::entity_list->GetClientEntity<Weapon>(weapon);
 }
+
+Vector Player::hitbox_pos(int id)
+{
+	Matrix3x4 bone_matrixes[128];
+	 
+	if (setup_bones(bone_matrixes, 128, 0x100, 0.f))
+	{
+		Matrix3x4 m = bone_matrixes[id];
+		return Vector{ m[0][3], m[1][3], m[2][3] };
+	}
+
+	return Vector{ 0, 0, 0 };
+}

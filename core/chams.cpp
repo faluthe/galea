@@ -47,16 +47,18 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 			render(player_material, config::colors::enemy_hidden, true);
 			hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, pCustomBoneToWorld);
 
-			int index = ent->ent_list_index();
-
-			if (!g::lagcomp_records[index].empty())
+			if (!g::lagcomp_records[pInfo.entity_index].empty())
 			{
-				for (auto& record : g::lagcomp_records[index])
+				for (size_t i = 0; i < g::lagcomp_records[pInfo.entity_index].size(); i++)
 				{
-					if (!features::backtrack::valid_tick(record.sim_time) || record.bone_matrix == nullptr)
+					auto record = &g::lagcomp_records[pInfo.entity_index][i];
+					if (!record || record->bone_matrix == nullptr || !features::backtrack::valid_tick(record->sim_time))
 						continue;
-					render(player_material, config::colors::interp_ticks, false);
-					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record.bone_matrix);
+					if (pInfo.entity_index == features::backtrack::target && i == features::backtrack::record)
+						render(player_material, colors::red, false);
+					else
+						render(player_material, config::colors::interp_ticks, false);
+					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record->bone_matrix);
 				}
 			}
 
