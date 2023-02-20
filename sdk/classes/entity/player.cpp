@@ -32,3 +32,8 @@ Vector Player::hitbox_pos(int id)
 
 	return Vector{ 0, 0, 0 };
 }
+
+void Player::set_abs_origin(Vector& origin)
+{
+	*reinterpret_cast<Vector*>(uintptr_t(this) + 0xA0) = origin;
+}

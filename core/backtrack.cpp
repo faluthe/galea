@@ -76,6 +76,7 @@ bool features::backtrack::valid_tick(float simtime)
 	auto time_delta = server_time - simtime;
 	// Difference between the max rewind time and the tick to check
 	auto delta = std::clamp(incoming + outgoing + lerp(cvars), 0.0f, unlag) - time_delta;
+	// auto delta = std::clamp(incoming + outgoing, 0.0f, unlag) - time_delta;
 
 	// Only care about ticks that are x seconds, or less, newer 
 	return std::abs(delta) <= 0.2f;
@@ -110,8 +111,22 @@ void features::backtrack::update_records()
 		Record record{};
 		record.origin = ent->origin();
 		record.sim_time = ent->sim_time();
+		
+		// Needs to be called if setupbones has already been called this frame to get rid of the previously cached bones
+		ent->invalidate_bone_cache();
+
+		// Align entity position with the server
+		auto old_origin = ent->get_abs_origin();
+		ent->set_abs_origin(ent->origin());
+
 		// Get entity's bone to world matrix (used for chams/rendering)
-		ent->setup_bones(record.bone_matrix, 128, 0x7FF00, ifaces::global_vars->curtime);
+		bool set_bones = ent->setup_bones(record.bone_matrix, 128, 0x7FF00, ifaces::global_vars->curtime);
+		
+		// Reset
+		ent->set_abs_origin(ent->origin());
+
+		if (!set_bones)
+			continue;
 
 		// New ticks are added to the front, old records are popped from the back
 		g::lagcomp_records[i].push_front(record);
@@ -200,5 +215,5 @@ void features::backtrack::run(CUserCmd* cmd)
 	static Cvars cvars = init_cvars();
 
 	if (best_record > 0 && cmd->buttons & CUserCmd::IN_ATTACK)
-		cmd->tick_count = time_to_ticks(g::lagcomp_records[best_index][best_record].sim_time); // +lerp(cvars));
+		cmd->tick_count = time_to_ticks(g::lagcomp_records[best_index][best_record].sim_time + lerp(cvars));
 }

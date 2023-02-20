@@ -55,7 +55,7 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 					if (!record || record->bone_matrix == nullptr || !features::backtrack::valid_tick(record->sim_time))
 						continue;
 					if (pInfo.entity_index == features::backtrack::target && i == features::backtrack::record)
-						render(player_material, colors::red, false);
+						render(player_material, config::colors::target_tick, false);
 					else
 						render(player_material, config::colors::interp_ticks, false);
 					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record->bone_matrix);

@@ -11,4 +11,5 @@ struct Entity
 	VIRTUAL_METHOD(bool, setup_bones, 13, (Matrix3x4* pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime), (get_renderable(), pBoneToWorldOut, nMaxBones, boneMask, currentTime))
 
 	bool valid_ptr();
+	void invalidate_bone_cache();
 };

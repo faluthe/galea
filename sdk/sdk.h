@@ -15,6 +15,7 @@ namespace sdk
 
 	namespace helpers
 	{
+		std::uint8_t* pattern_scan(const char* module_name, const char* signature);
 		template<typename R, int index, typename ...A>
 		constexpr R call_virtual_method(void* pInterface, A... arguments)
 		{

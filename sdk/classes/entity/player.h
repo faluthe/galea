@@ -20,9 +20,11 @@ struct Player : Entity
 	NETVAR(float, sim_time, "DT_CSPlayer", "m_flSimulationTime")
 	NETVAR(Vector, origin, "DT_BasePlayer", "m_vecOrigin")
 
+	VIRTUAL_METHOD(Vector&, get_abs_origin, 10, (), (this))
 	VIRTUAL_METHOD(bool, is_dormant, 9, (), (this + sizeof(uintptr_t) * 2))
 	VIRTUAL_METHOD(int, ent_list_index, 10, (), (get_networkable()))
 	
+	void set_abs_origin(Vector& origin);
 	Weapon* active_weapon();
 	bool is_alive();
 	Vector hitbox_pos(int id);
