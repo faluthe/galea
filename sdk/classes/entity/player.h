@@ -19,6 +19,7 @@ struct Player : Entity
 	NETVAR(Team, team, "DT_BasePlayer", "m_iTeamNum")
 	NETVAR(float, sim_time, "DT_CSPlayer", "m_flSimulationTime")
 	NETVAR(Vector, origin, "DT_BasePlayer", "m_vecOrigin")
+	NETVAR(Vector, aim_punch, "DT_BasePlayer", "m_aimPunchAngle")
 
 	VIRTUAL_METHOD(Vector&, get_abs_origin, 10, (), (this))
 	VIRTUAL_METHOD(bool, is_dormant, 9, (), (this + sizeof(uintptr_t) * 2))

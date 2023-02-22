@@ -1,22 +1,17 @@
 #include "../sdk/globals/globals.h"
 #include "../sdk/interfaces/interfaces.h"
+#include "configuration/config.h"
 #include "features.h"
 
-void features::test_esp()
+void features::esp::crosshair()
 {
-	for (int i = 1; i < ifaces::engine->GetMaxClients(); i++)
-	{
-		auto ent = ifaces::entity_list->GetClientEntity<Player>(i);
+	if (!config::crosshair || !g::localplayer->valid_ptr() || !g::localplayer->is_alive())
+		return;
 
-		if (!ent || !ent->is_alive() || ent->is_dormant() || ent->team() == g::localplayer->team())
-			continue;
+	int x = g::screen_center_x - (g::screen_width / 90 * static_cast<int>(g::localplayer->aim_punch().y));
+	int y = g::screen_center_y + (g::screen_width / 90 * static_cast<int>(g::localplayer->aim_punch().x));
 
-		auto head_pos = ent->hitbox_pos(8);
-		Vector pos_2d;
-		if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
-			continue;
-
-		g::fonts::config.print(L"H", pos_2d.x, pos_2d.y);
-
-	}
+	ifaces::surface->DrawSetColor(config::colors::crosshair);
+	ifaces::surface->DrawLine(x + 5, y, x - 5, y);
+	ifaces::surface->DrawLine(x, y + 5, x, y - 5);
 }

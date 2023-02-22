@@ -77,6 +77,7 @@ static void __stdcall hkPaintTraverse(unsigned int vguiPanel, bool forceRepaint,
 		
 		config::render();
 		config::render_watermark();
+		features::esp::crosshair();
 	}
 }
 

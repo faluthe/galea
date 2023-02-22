@@ -76,7 +76,6 @@ bool features::backtrack::valid_tick(float simtime)
 	auto time_delta = server_time - simtime;
 	// Difference between the max rewind time and the tick to check
 	auto delta = std::clamp(incoming + outgoing + lerp(cvars), 0.0f, unlag) - time_delta;
-	// auto delta = std::clamp(incoming + outgoing, 0.0f, unlag) - time_delta;
 
 	// Only care about ticks that are x seconds, or less, newer 
 	return std::abs(delta) <= 0.2f;
@@ -116,7 +115,7 @@ void features::backtrack::update_records()
 		ent->invalidate_bone_cache();
 
 		// Align entity position with the server
-		auto old_origin = ent->get_abs_origin();
+		auto& old_origin = ent->get_abs_origin();
 		ent->set_abs_origin(ent->origin());
 
 		// Get entity's bone to world matrix (used for chams/rendering)
@@ -168,8 +167,11 @@ void features::backtrack::run(CUserCmd* cmd)
 		Vector pos_2d;
 		if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
 			continue;
-		auto d_x = (pos_2d.x - g::screen_center_x) * (pos_2d.x - g::screen_center_x);
-		auto d_y = (pos_2d.y - g::screen_center_y) * (pos_2d.y - g::screen_center_y);
+
+		int x = g::screen_center_x - (g::screen_width / 90 * static_cast<int>(g::localplayer->aim_punch().y));
+		int y = g::screen_center_y + (g::screen_width / 90 * static_cast<int>(g::localplayer->aim_punch().x));
+		auto d_x = (pos_2d.x - x) * (pos_2d.x - x);
+		auto d_y = (pos_2d.y - y) * (pos_2d.y - y);
 		auto fov = std::sqrt(d_x + d_y);
 
 		if (fov < best_fov)

@@ -11,6 +11,7 @@ void g::get_localplayer()
 		static bool once = []() { sdk::debug::print_address("localplayer", reinterpret_cast<uintptr_t>(localplayer)); return true; } ();
 }
 
+// Also updates fonts when screen size changes!!
 void g::get_screen_size()
 {
 	int new_width, new_height;
