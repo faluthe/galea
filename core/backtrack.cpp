@@ -6,6 +6,9 @@
 #include "../sdk/interfaces/interfaces.h"
 #include "../valve/ConVar.h"
 #include "../valve/CUserCmd.h"
+#include "../valve/VarMap.h"
+#include "../sdk/classes/math/math.h"
+#include "configuration/config.h"
 #include "features.h"
 
 // Good resource: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
@@ -45,6 +48,11 @@ int time_to_ticks(float time)
 	return static_cast<int>(0.5f + time / ifaces::global_vars->interval_per_tick);
 }
 
+float ticks_to_time(int ticks)
+{
+	return ifaces::global_vars->interval_per_tick * static_cast<float>(ticks);
+}
+
 // Get interpolation period (time between rendering time and real time)
 float lerp(const Cvars& cvars)
 {
@@ -53,6 +61,9 @@ float lerp(const Cvars& cvars)
 	auto max = cvars.max_interp_ratio->GetFloat();
 	auto ratio = std::clamp(cvars.interp_ratio->GetFloat(), min, max);
 	auto rate = cvars.maxupdaterate ? cvars.maxupdaterate->GetFloat() : cvars.updaterate->GetFloat();
+
+	features::esp::lerp = (std::max)(cvars.interp->GetFloat(), ratio / rate);
+
 	return (std::max)(cvars.interp->GetFloat(), ratio / rate);
 }
 
@@ -78,7 +89,7 @@ bool features::backtrack::valid_tick(float simtime)
 	auto delta = std::clamp(incoming + outgoing + lerp(cvars), 0.0f, unlag) - time_delta;
 
 	// Only care about ticks that are x seconds, or less, newer 
-	return std::abs(delta) <= 0.2f;
+	return std::abs(delta) < (0.2f + config::fakeping);
 }
 
 // Updates g::lagcomp_records
@@ -91,6 +102,9 @@ void features::backtrack::update_records()
 			record.clear();
 		return;
 	}
+
+	if (!ifaces::engine->GetNetChannelInfo())
+		return;
 
 	for (int i = 1; i <= ifaces::engine->GetMaxClients(); i++)
 	{
@@ -107,22 +121,23 @@ void features::backtrack::update_records()
 		if (!g::lagcomp_records[i].empty() && g::lagcomp_records[i].front().sim_time == ent->sim_time())
 			continue;
 
-		Record record{};
-		record.origin = ent->origin();
-		record.sim_time = ent->sim_time();
+		 // Align entity position with the server
+		 auto& old_origin = ent->get_abs_origin();
+		 ent->set_abs_origin(ent->origin());
 		
 		// Needs to be called if setupbones has already been called this frame to get rid of the previously cached bones
-		ent->invalidate_bone_cache();
+		// Was having some issues with this...
+		// ent->invalidate_bone_cache();
 
-		// Align entity position with the server
-		auto& old_origin = ent->get_abs_origin();
-		ent->set_abs_origin(ent->origin());
+		Record record{};
+		record.head = ent->hitbox_pos(8);
+		record.sim_time = ent->sim_time();
 
 		// Get entity's bone to world matrix (used for chams/rendering)
 		bool set_bones = ent->setup_bones(record.bone_matrix, 128, 0x7FF00, ifaces::global_vars->curtime);
 		
 		// Reset
-		ent->set_abs_origin(ent->origin());
+		// ent->set_abs_origin(ent->origin());
 
 		if (!set_bones)
 			continue;
@@ -130,8 +145,8 @@ void features::backtrack::update_records()
 		// New ticks are added to the front, old records are popped from the back
 		g::lagcomp_records[i].push_front(record);
 
-		// Store between 3 ticks and 200 milliseconds worth of ticks
-		while (g::lagcomp_records[i].size() > 3 && g::lagcomp_records[i].size() > static_cast<size_t>(time_to_ticks(0.2f)))
+		// Store between 3 ticks and 200 milliseconds (+ fake ping) worth of ticks
+		while (g::lagcomp_records[i].size() > 3 && g::lagcomp_records[i].size() > static_cast<size_t>(time_to_ticks(0.2f + config::fakeping)))
 			g::lagcomp_records[i].pop_back();
 
 		auto rstart = std::cbegin(g::lagcomp_records[i]);
@@ -147,11 +162,12 @@ void features::backtrack::update_records()
 
 void features::backtrack::run(CUserCmd* cmd)
 {
+	static Cvars cvars = init_cvars();
+
 	if (!g::localplayer->valid_ptr() || !g::localplayer->is_alive())
 		return;
 
-	float best_fov = FLT_MAX;
-	float best_dist = FLT_MAX;
+	float best_fov = 255.f;
 	int best_index = 0;
 	int best_record = 0;
 	Player* best_target = nullptr;
@@ -164,6 +180,11 @@ void features::backtrack::run(CUserCmd* cmd)
 			continue;
 
 		auto head_pos = ent->hitbox_pos(8);
+		/*math::vector_angles(head_pos).normalize();
+		head_pos.clamp();
+
+		auto fov = sdk::helpers::get_fov(cmd->viewangles + (g::localplayer->aim_punch() * 2.f), head_pos);*/
+
 		Vector pos_2d;
 		if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
 			continue;
@@ -188,7 +209,7 @@ void features::backtrack::run(CUserCmd* cmd)
 		if (g::lagcomp_records[best_index].size() <= 3)
 			return;
 
-		best_fov = FLT_MAX;
+		best_fov = 255.f;
 
 		for (size_t i = 0; i < g::lagcomp_records[best_index].size(); i++)
 		{
@@ -196,10 +217,13 @@ void features::backtrack::run(CUserCmd* cmd)
 			if (!record || !valid_tick(record->sim_time))
 				continue;
 
-			Matrix3x4 m = record->bone_matrix[8];
-			Vector head_pos{ m[0][3], m[1][3], m[2][3] };
+			/*Matrix3x4 m = record->bone_matrix[8];
+			Vector head_pos{ m[0][3], m[1][3], m[2][3] };*/
+			
+			// auto fov = sdk::helpers::get_fov(cmd->viewangles + (g::localplayer->aim_punch() * 2.f), record->head);
+			
 			Vector pos_2d;
-			if (ifaces::debug_overlay->ScreenPosition(&head_pos, &pos_2d) != 0)
+			if (ifaces::debug_overlay->ScreenPosition(&record->head, &pos_2d) != 0)
 				continue;
 			auto d_x = (pos_2d.x - g::screen_center_x) * (pos_2d.x - g::screen_center_x);
 			auto d_y = (pos_2d.y - g::screen_center_y) * (pos_2d.y - g::screen_center_y);
@@ -214,8 +238,30 @@ void features::backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	static Cvars cvars = init_cvars();
-
 	if (best_record > 0 && cmd->buttons & CUserCmd::IN_ATTACK)
 		cmd->tick_count = time_to_ticks(g::lagcomp_records[best_index][best_record].sim_time + lerp(cvars));
+}
+
+void features::backtrack::disable_interpolation()
+{
+	if (g::localplayer->valid_ptr() && g::localplayer->is_alive())
+	{
+		for (int i = 1; i <= ifaces::engine->GetMaxClients(); i++)
+		{
+			auto ent = ifaces::entity_list->GetClientEntity<Player>(i);
+			if (!ent->valid_ptr() || ent->team() == g::localplayer->team() || ent->is_dormant())
+				continue;
+
+			/* See: https://github.com/faluthe/cstrike15_src/blob/8ee527f36d6fcc991a8dadf37eb7628189580340/game/client/c_baseentity.cpp#L1042
+			        https://www.unknowncheats.me/forum/counterstrike-global-offensive/332085-help-disable-interpolation-yoda.html */
+			VarMapping_t* map = reinterpret_cast<VarMapping_t*>(reinterpret_cast<uintptr_t>(ent) + 0x24);
+			for (int i = 0; i < map->m_nInterpolatedEntries; i++)
+			{
+				VarMapEntry_t* entry = &map->m_Entries[i];
+				if (!entry)
+					continue;
+				entry->m_bNeedsToInterpolate = false;
+			}
+		}
+	}
 }

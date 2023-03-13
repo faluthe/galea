@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../valve/CGlobalVarsBase.h"
+#include "../../valve/CNetChan.h"
 #include "../../valve/IBaseClientDLL.h"
 #include "../../valve/IClientEntityList.h"
 #include "../../valve/ICvar.h"
@@ -25,6 +26,7 @@ namespace ifaces
 	inline CGlobalVarsBase* global_vars{};
 	inline IMaterialSystem* mat_sys{};
 	inline IVModelRender* mdl_render{};
+	inline CNetChan* netchan{};
 	inline IPanel* panel{};
 	inline IStudioRender* studio_render{};
 	inline ISurface* surface{};

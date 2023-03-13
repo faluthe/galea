@@ -37,6 +37,8 @@ DWORD WINAPI init(HMODULE hModule)
     {
         // Restore all hooked functions
         hooks::restore_all();
+        // Restore convars
+        config::convars::restore();
         // Free console
         sdk::debug::free_console();
     }

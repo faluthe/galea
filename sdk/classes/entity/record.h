@@ -5,7 +5,7 @@
 
 struct Record
 {
-	Vector origin{};
+	Vector head{};
 	float sim_time{};
 	Matrix3x4 bone_matrix[128];
 };

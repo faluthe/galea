@@ -11,7 +11,9 @@
 #include "hooks.h"
 
 static bool(__stdcall* oCreateMove)(float, CUserCmd*);
+static void(__thiscall* oFrameStageNotify)(void*, FrameStage);
 static void(__thiscall* oPaintTraverse)(IPanel*, unsigned int, bool, bool);
+static int(__thiscall* oSendDatagram)(CNetChan*, void*);
 
 void Hook::hook_function(unsigned short index, void* hkFunc, void** oFunc)
 {
@@ -22,21 +24,64 @@ void Hook::hook_function(unsigned short index, void* hkFunc, void** oFunc)
 		throw std::runtime_error("oFunc is nullptr");
 }
 
+// Thanks sharklaser! See: https://www.unknowncheats.me/forum/counterstrike-global-offensive/227226-synced-fake-ping.html
+int __fastcall hkSendDatagram(CNetChan* netchan, void*, void* datagram)
+{
+	if (!ifaces::engine->IsInGame())
+	{
+		features::backtrack::last_sequence = 0;
+		return oSendDatagram(netchan, datagram);
+	}
+
+	if (datagram)
+		return oSendDatagram(netchan, datagram);
+
+	auto state = netchan->m_nInReliableState;
+	auto sequence_nr = netchan->m_nInSequenceNr;
+
+	if (config::fakeping > 0.f)
+	{
+		features::backtrack::add_latency(netchan, config::fakeping);
+
+		int og = oSendDatagram(netchan, datagram);
+
+		netchan->m_nInReliableState = state;
+		netchan->m_nInSequenceNr = sequence_nr;
+
+		return og;
+	}
+	else
+		return oSendDatagram(netchan, datagram);
+}
+
 // Called once per tick in game
 static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 {
 	// Remember, this function is only called in game!
 	static bool hooked = []() { sdk::debug::print("CreateMove hooked"); return true; } ();
+	static bool send_datagram_hook = []() {
+		// MAKE THIS MORE CONCISE
+		auto client_state = **reinterpret_cast<void***>(sdk::helpers::pattern_scan("engine.dll", "A1 ? ? ? ? 8B 80 ? ? ? ? C3") + 1);
+		ifaces::netchan = *reinterpret_cast<CNetChan**>(reinterpret_cast<uintptr_t>(client_state) + 0x9C);
+
+		auto addr = sdk::helpers::pattern_scan("engine.dll", "55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 14");
+		if (MH_CreateHook(reinterpret_cast<void*>(addr), &hkSendDatagram, reinterpret_cast<void**>(&oSendDatagram)) != MH_OK)
+			throw std::runtime_error("SendDatagram Hook failed");
+		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
+			throw std::runtime_error("Could not enable hook");
+		return true;
+	} ();
 
 	// Causing issues
 	/*if (cmd == nullptr || cmd->command_number == 0)
 		return oCreateMove(sampletime, cmd);*/
 
 	g::get_localplayer();
+	static bool set_vars = []() { config::convars::set(); return true; } ();
 
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);
-	features::backtrack::update_records();
+	features::backtrack::update_sequences();
 	features::backtrack::run(cmd);
 
 	// Remove crouch delay
@@ -59,6 +104,17 @@ static void __fastcall hkDrawModelExecute(void* _this, void* _edx, void* pRender
 	ifaces::studio_render->ForcedMaterialOverride(nullptr);
 }
 
+void __stdcall hkFrameStageNotify(FrameStage frame_stage)
+{
+	// PostDataUpdate has been called and we're about to interpolate, or not ;)
+	if (frame_stage == FrameStage::FRAME_NET_UPDATE_POSTDATAUPDATE_END)
+		features::backtrack::disable_interpolation();
+	else if (frame_stage == FrameStage::FRAME_NET_UPDATE_END)
+		features::backtrack::update_records();
+
+	oFrameStageNotify(ifaces::client, frame_stage);
+}
+
 static void __stdcall hkPaintTraverse(unsigned int vguiPanel, bool forceRepaint, bool allowForce)
 {
 	static bool hooked = []() { sdk::debug::print("PaintTraverse hooked"); return true; } ();
@@ -74,6 +130,8 @@ static void __stdcall hkPaintTraverse(unsigned int vguiPanel, bool forceRepaint,
 		   only when the screen size is relevant. Fonts are also configured here,
 		   as the two are directly correlated */
 		g::get_screen_size();
+
+		features::esp::lerp_test();
 		
 		config::render();
 		config::render_watermark();
@@ -86,10 +144,12 @@ void hooks::init()
 	if (MH_Initialize() != MH_OK)
 		throw std::runtime_error("MinHook not initialized");
 
+	Hook client{ ifaces::client };
 	Hook client_mode{ ifaces::client_mode };
 	Hook mdl_render{ ifaces::mdl_render };
 	Hook panel{ ifaces::panel };
 
+	client.hook_function(37, &hkFrameStageNotify, reinterpret_cast<void**>(&oFrameStageNotify));
 	client_mode.hook_function(24, &hkCreateMove, reinterpret_cast<void**>(&oCreateMove));
 	mdl_render.hook_function(21, &hkDrawModelExecute, reinterpret_cast<void**>(&oDrawModelExecute));
 	panel.hook_function(41, &hkPaintTraverse, reinterpret_cast<void**>(&oPaintTraverse));

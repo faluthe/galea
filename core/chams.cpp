@@ -10,10 +10,10 @@
 #include "../valve/IVModelRender.h"
 #include "features.h"
 
-static IMaterial* setup_material()
+static IMaterial* setup_material(const char* material_name)
 {
 	// This implementation is temporary
-	auto material = ifaces::mat_sys->FindMaterial("debug/debugambientcube", "Model textures");
+	auto material = ifaces::mat_sys->FindMaterial(material_name, "Model textures");
 	material->SetMaterialVarFlags(MaterialVarFlags_t::MATERIAL_VAR_NO_DRAW, false);
 
 	return material;
@@ -40,29 +40,47 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 		if (!ent->valid_ptr() || ent->is_dormant() || !ent->is_alive() || ent == g::localplayer)
 			return;
 
-		static auto player_material = setup_material();
+		static auto debug_material = setup_material("debug/debugambientcube");
+		static auto flat_material = setup_material("debug/debugdrawflat");
+		static auto wire_material = setup_material("debug/debugwireframe");
 
 		if (ent->team() != g::localplayer->team())
 		{
-			render(player_material, config::colors::enemy_hidden, true);
-			hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, pCustomBoneToWorld);
+			if (config::ignore_z) {
+				render(debug_material, config::colors::enemy_hidden, true);
+				hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, pCustomBoneToWorld);
+			}
 
 			if (!g::lagcomp_records[pInfo.entity_index].empty())
 			{
+				auto interp_color = config::colors::enemy_visible;
+				interp_color.a = 45;
+				int target_tick = g::lagcomp_records[pInfo.entity_index].size();
 				for (size_t i = 0; i < g::lagcomp_records[pInfo.entity_index].size(); i++)
 				{
+					interp_color.r += 4;
+					interp_color.g += 4;
+					interp_color.b += 4;
 					auto record = &g::lagcomp_records[pInfo.entity_index][i];
 					if (!record || record->bone_matrix == nullptr || !features::backtrack::valid_tick(record->sim_time))
 						continue;
-					if (pInfo.entity_index == features::backtrack::target && i == features::backtrack::record)
-						render(player_material, config::colors::target_tick, false);
+					if (config::render_target_tick && pInfo.entity_index == features::backtrack::target && i == features::backtrack::record)
+						target_tick = i;
 					else
-						render(player_material, config::colors::interp_ticks, false);
-					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record->bone_matrix);
+					{
+						render(flat_material, interp_color, false);
+						hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record->bone_matrix);
+					}
+				}
+				// Render target tick on top
+				if (target_tick < g::lagcomp_records[pInfo.entity_index].size())
+				{
+					render(flat_material, config::colors::target_tick, false);
+					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, g::lagcomp_records[pInfo.entity_index][target_tick].bone_matrix);
 				}
 			}
 
-			render(player_material, config::colors::enemy_visible, false);
+			render(debug_material, config::colors::enemy_visible, false);
 		}
 	}
 }

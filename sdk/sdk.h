@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "classes/math/vector.h"
+
 namespace sdk
 {
 	namespace debug
@@ -16,6 +18,7 @@ namespace sdk
 	namespace helpers
 	{
 		std::uint8_t* pattern_scan(const char* module_name, const char* signature);
+		float get_fov(const Vector& view_angle, const Vector& aim_angle);
 		template<typename R, int index, typename ...A>
 		constexpr R call_virtual_method(void* pInterface, A... arguments)
 		{

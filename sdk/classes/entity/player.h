@@ -24,6 +24,12 @@ struct Player : Entity
 	VIRTUAL_METHOD(Vector&, get_abs_origin, 10, (), (this))
 	VIRTUAL_METHOD(bool, is_dormant, 9, (), (this + sizeof(uintptr_t) * 2))
 	VIRTUAL_METHOD(int, ent_list_index, 10, (), (get_networkable()))
+	Vector eye_position()
+	{
+		Vector v;
+		sdk::helpers::call_virtual_method<void, 285>(this, std::ref(v));
+		return v;
+	}
 	
 	void set_abs_origin(Vector& origin);
 	Weapon* active_weapon();

@@ -1,6 +1,9 @@
+#include <cmath>
 #include <Windows.h>
 #include <vector>
 
+#include "../classes/math/math.h"
+#include "../classes/math/vector.h"
 #include "../sdk.h"
 
 std::uint8_t* sdk::helpers::pattern_scan(const char* module_name, const char* signature)
@@ -56,4 +59,12 @@ std::uint8_t* sdk::helpers::pattern_scan(const char* module_name, const char* si
     }
 
     return 0;
+}
+
+float sdk::helpers::get_fov(const Vector& view_angle, const Vector& aim_angle)
+{
+    auto view = math::angle_vector(view_angle);
+    auto aim = math::angle_vector(aim_angle);
+
+    return math::radian_to_degree(std::acos(view.dot(aim)) / view.length_sqr());
 }

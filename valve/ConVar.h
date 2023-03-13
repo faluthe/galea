@@ -12,4 +12,6 @@ struct ConVar
 	const char* name;
 
 	VIRTUAL_METHOD(float, GetFloat, 12, (), (this))
+	VIRTUAL_METHOD(void, SetString, 14, (const char* string), (this, string))
+	VIRTUAL_METHOD(void, SetInt, 16, (int value), (this, value))
 };

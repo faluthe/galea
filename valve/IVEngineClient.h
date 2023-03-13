@@ -13,5 +13,6 @@ struct IVEngineClient
 	// Returns index of localplayer in entity list
 	VIRTUAL_METHOD(int, GetLocalPlayer, 12, (), (this))
 	VIRTUAL_METHOD(int, GetMaxClients, 20, (), (this))
+	VIRTUAL_METHOD(bool, IsInGame, 26, (), (this))
 	VIRTUAL_METHOD(INetChannelInfo*, GetNetChannelInfo, 78, (), (this))
 };

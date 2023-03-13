@@ -9,30 +9,6 @@
 // Pixels between each option
 static constexpr int y_distance{ 3 };
 
-static int y_selected{ y_distance };
-
-static void option_bool(const std::wstring& title, bool& state, int& y_offset, int& max_options)
-{
-	if (GetAsyncKeyState(VK_DOWN) & 1 && y_selected < max_options + y_selected)
-		y_selected += g::fonts::config.height + y_distance;
-	else if (GetAsyncKeyState(VK_UP) & 1 && y_selected > y_distance)
-		y_selected -= g::fonts::config.height + y_distance;
-
-	if (y_offset == y_selected)
-	{
-		g::fonts::config.print(L"> " + title, g::screen_width / 4, y_offset, state ? colors::red : colors::grey);
-		
-		if ((GetAsyncKeyState(VK_RIGHT) & 1 || GetAsyncKeyState(VK_LEFT) & 1))
-			state = !state;
-	}
-	else
-		g::fonts::config.print(title, g::screen_width / 4, y_offset, state ? colors::red : colors::grey);
-
-	y_offset += g::fonts::config.height + y_distance;
-
-	max_options += y_distance;
-}
-
 void config::render_watermark()
 {
 	g::fonts::config.print(L"Galea by falu", g::screen_width - (g::screen_height / 8), y_distance);
@@ -40,21 +16,94 @@ void config::render_watermark()
 
 void config::render()
 {
-	static bool menu_active{ false };
-
+	static bool menu_active = false;
 	if (GetAsyncKeyState(menu_button) & 1)
-	{
 		menu_active = !menu_active;
-		y_selected = y_distance;
-	}
+
+	static std::vector<Option*> cfg = {
+		new BoolOption(L"Autopistol", &config::autopistol),
+		new BoolOption(L"Bunnyhop", &config::bunnyhop),
+		new BoolOption(L"Chams", &config::chams),
+		new InvisibleBool(L"Ignore Z", &config::ignore_z, &config::chams),
+		new InvisibleBool(L"Render target tick", &config::render_target_tick, &config::chams),
+		new BoolOption(L"Recoil Crosshair", &config::crosshair),
+		new FloatOption(L"Fakeping", &config::fakeping, 0.02f, 0.f, 0.2f)
+	};
 
 	if (menu_active)
 	{
-		int y_offset{ y_distance };
-		int max_options{ y_distance };
+		static int selected = 0;
+		if (GetAsyncKeyState(VK_DOWN) & 1)
+			selected = selected >= cfg.size() - 1 ? 0 : selected + 1;
+		else if (GetAsyncKeyState(VK_UP) & 1)
+			selected = selected <= 0 ? cfg.size() - 1 : selected - 1;
 
-		option_bool(L"Autopistol", config::autopistol, y_offset, max_options);
-		option_bool(L"Bunnyhop", config::bunnyhop, y_offset, max_options);
-		option_bool(L"Chams", config::chams, y_offset, max_options);
+		int y_offset = y_distance;
+		for (size_t i = 0; i < cfg.size(); i++)
+		{
+			if (i == selected)
+				cfg.at(i)->while_selected(g::screen_width / 4, y_offset);
+			else
+				cfg.at(i)->while_not_selected(g::screen_width / 4, y_offset);
+		}
 	}
+}
+
+void BoolOption::while_selected(int x, int& y)
+{
+	g::fonts::config.print(L"> " + title, g::screen_width / 4, y, *state ? colors::red : colors::grey);
+
+	if ((GetAsyncKeyState(VK_RIGHT) & 1 || GetAsyncKeyState(VK_LEFT) & 1))
+		*state = !(*state);
+
+	y += g::fonts::config.height + y_distance;
+}
+
+void BoolOption::while_not_selected(int x, int& y)
+{
+	g::fonts::config.print(title, g::screen_width / 4, y, *state ? colors::red : colors::grey);
+
+	y += g::fonts::config.height + y_distance;
+}
+
+void InvisibleBool::while_selected(int x, int& y)
+{
+	if (!(*parent))
+		return;
+
+	g::fonts::config.print(L"\t> " + title, g::screen_width / 4, y, *state ? colors::red : colors::grey);
+
+	if ((GetAsyncKeyState(VK_RIGHT) & 1 || GetAsyncKeyState(VK_LEFT) & 1))
+		*state = !(*state);
+
+	y += g::fonts::config.height + y_distance;
+}
+
+void InvisibleBool::while_not_selected(int x, int& y)
+{
+	if (!(*parent))
+		return;
+
+	g::fonts::config.print(L"\t" + title, g::screen_width / 4, y, *state ? colors::red : colors::grey);
+
+	y += g::fonts::config.height + y_distance;
+}
+
+void FloatOption::while_selected(int x, int& y)
+{
+	g::fonts::config.print(L"> " + title + L": " + std::to_wstring(*flt).substr(0, 5), g::screen_width / 4, y, colors::red);
+
+	if (GetAsyncKeyState(VK_RIGHT) & 1)
+		*flt = *flt >= max ? min : *flt + modifier;
+	else if (GetAsyncKeyState(VK_LEFT) & 1)
+		*flt = *flt <= min ? max : *flt - modifier;
+
+	y += g::fonts::config.height + y_distance;
+}
+
+void FloatOption::while_not_selected(int x, int& y)
+{
+	g::fonts::config.print(title + L": " + std::to_wstring(*flt).substr(0, 5), g::screen_width / 4, y, colors::red);
+
+	y += g::fonts::config.height + y_distance;
 }
