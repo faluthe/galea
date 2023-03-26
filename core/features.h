@@ -31,4 +31,6 @@ namespace features
 	void autopistol(CUserCmd* cmd);
 	void bunnyhop(CUserCmd* cmd);
 	void chams(void* _this, void* _edx, void* pRenderContext, const ModelRenderInfo_t& state, const ModelRenderInfo_t& pInfo, Matrix3x4* pCustomBoneToWorld);
+	void skinchanger();
+	void triggerbot(CUserCmd* cmd);
 }

@@ -46,6 +46,18 @@ struct FloatOption : Option
 	virtual void while_not_selected(int x, int& y) override;
 };
 
+struct IntOption : Option
+{
+	IntOption(const std::wstring title, int* i, int modifier, int min, int max)
+		: Option(title), i{ i }, modifier{ modifier }, min{ min }, max{ max } {}
+	int* i;
+	int modifier;
+	int min;
+	int max;
+	virtual void while_selected(int x, int& y) override;
+	virtual void while_not_selected(int x, int& y) override;
+};
+
 namespace config
 {
 	void render();
@@ -56,11 +68,13 @@ namespace config
 
 	inline bool autopistol{ true };
 	inline bool bunnyhop{ true };
+	inline bool backtrack_chams{ true };
 	inline bool chams{ true };
 	inline bool ignore_z{ false };
-	inline bool render_target_tick{ true };
-	inline bool crosshair{ true };
+	inline bool render_target_tick{ false };
+	inline int crosshair_mode{ 1 };
 	inline float fakeping{ 0.0f };
+	inline bool triggerbot{ true };
 
 	namespace colors
 	{
@@ -75,8 +89,8 @@ namespace config
 	{
 		// Go to the moon!
 		inline bool apollo{ true };
-		inline bool crosshair_recoil{ true };
 		inline bool nade_preview{ true };
+		inline bool stretched_ratio{ false };
 
 		void set();
 		// Called when uninjecting

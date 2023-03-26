@@ -66,14 +66,14 @@ void features::chams(void* _this, void* _edx, void* pRenderContext, const ModelR
 						continue;
 					if (config::render_target_tick && pInfo.entity_index == features::backtrack::target && i == features::backtrack::record)
 						target_tick = i;
-					else
+					else if (config::backtrack_chams)
 					{
 						render(flat_material, interp_color, false);
 						hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, record->bone_matrix);
 					}
 				}
 				// Render target tick on top
-				if (target_tick < g::lagcomp_records[pInfo.entity_index].size())
+				if (static_cast<size_t>(target_tick) < g::lagcomp_records[pInfo.entity_index].size())
 				{
 					render(flat_material, config::colors::target_tick, false);
 					hooks::oDrawModelExecute(_this, _edx, pRenderContext, state, pInfo, g::lagcomp_records[pInfo.entity_index][target_tick].bone_matrix);

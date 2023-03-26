@@ -11,6 +11,7 @@
 #include "../../valve/ISurface.h"
 #include "../../valve/IVDebugOverlay.h"
 #include "../../valve/IVEngineClient.h"
+#include "../../valve/IVModelInfo.h"
 #include "../../valve/IVModelRender.h"
 
 namespace ifaces
@@ -25,6 +26,7 @@ namespace ifaces
 	inline IClientEntityList* entity_list{};
 	inline CGlobalVarsBase* global_vars{};
 	inline IMaterialSystem* mat_sys{};
+	inline IVModelInfo* mdl_info{};
 	inline IVModelRender* mdl_render{};
 	inline CNetChan* netchan{};
 	inline IPanel* panel{};

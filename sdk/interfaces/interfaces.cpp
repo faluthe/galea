@@ -32,6 +32,7 @@ void ifaces::init()
 	entity_list = get_interface<IClientEntityList>(client_dll, "VClientEntityList003");
 	global_vars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0xB] + 0xA);
 	mat_sys = get_interface<IMaterialSystem>(GetModuleHandleA("materialsystem.dll"), "VMaterialSystem080");
+	mdl_info = get_interface<IVModelInfo>(engine_dll, "VModelInfoClient004");
 	mdl_render = get_interface<IVModelRender>(engine_dll, "VEngineModel016");
 	panel = get_interface<IPanel>(GetModuleHandleA("vgui2.dll"), "VGUI_Panel009");
 	studio_render = get_interface<IStudioRender>(GetModuleHandleA("studiorender.dll"), "VStudioRender026");

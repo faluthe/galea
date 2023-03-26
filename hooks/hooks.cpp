@@ -77,10 +77,11 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 		return oCreateMove(sampletime, cmd);*/
 
 	g::get_localplayer();
-	static bool set_vars = []() { config::convars::set(); return true; } ();
+	config::convars::set();
 
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);
+	features::triggerbot(cmd);
 	features::backtrack::update_sequences();
 	features::backtrack::run(cmd);
 
@@ -111,6 +112,8 @@ void __stdcall hkFrameStageNotify(FrameStage frame_stage)
 		features::backtrack::disable_interpolation();
 	else if (frame_stage == FrameStage::FRAME_NET_UPDATE_END)
 		features::backtrack::update_records();
+	else if (frame_stage == FrameStage::FRAME_NET_UPDATE_POSTDATAUPDATE_START)
+		features::skinchanger();
 
 	oFrameStageNotify(ifaces::client, frame_stage);
 }

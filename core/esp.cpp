@@ -5,7 +5,7 @@
 
 void features::esp::crosshair()
 {
-	if (!config::crosshair || !g::localplayer->valid_ptr() || !g::localplayer->is_alive())
+	if (config::crosshair_mode != 2 || !g::localplayer->valid_ptr() || !g::localplayer->is_alive())
 		return;
 
 	int x = g::screen_center_x - static_cast<int>(g::screen_width / 90 * g::localplayer->aim_punch().y);
