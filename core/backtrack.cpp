@@ -62,8 +62,6 @@ float lerp(const Cvars& cvars)
 	auto ratio = std::clamp(cvars.interp_ratio->GetFloat(), min, max);
 	auto rate = cvars.maxupdaterate ? cvars.maxupdaterate->GetFloat() : cvars.updaterate->GetFloat();
 
-	features::esp::lerp = (std::max)(cvars.interp->GetFloat(), ratio / rate);
-
 	return (std::max)(cvars.interp->GetFloat(), ratio / rate);
 }
 

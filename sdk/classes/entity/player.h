@@ -26,6 +26,7 @@ struct Player : Entity
 	NETVAR(Vector, aim_punch, "DT_BasePlayer", "m_aimPunchAngle")
 	NETVAR(WeaponList, my_weapons, "DT_BaseCombatCharacter", "m_hMyWeapons")
 	NETVAR(int, view_model, "DT_BasePlayer", "m_hViewModel[0]")
+	NETVAR(float, flash_alpha, "DT_CSPlayer", "m_flFlashMaxAlpha")
 	int& crosshair_id()
 	{
 		static uintptr_t offset{};

@@ -30,7 +30,8 @@ void config::render()
 		new InvisibleBool(L"Render Target Tick", &config::render_target_tick, &config::chams),
 		new IntOption(L"Crosshair mode", &config::crosshair_mode, 1, 0, 2),
 		new FloatOption(L"Fakeping", &config::fakeping, 0.02f, 0.f, 0.2f),
-		new BoolOption(L"Streched Ratio", &config::convars::stretched_ratio)
+		new BoolOption(L"Streched Ratio", &config::convars::stretched_ratio),
+		new FloatOption(L"Anti-flash", &config::anti_flash, 127.5f, 0.f, 255.f),
 	};
 
 	if (menu_active)

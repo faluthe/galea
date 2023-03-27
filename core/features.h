@@ -23,9 +23,9 @@ namespace features
 
 	namespace esp
 	{
+		void anti_flash();
 		void crosshair();
-		void lerp_test();
-		inline float lerp{};
+		void restore_flash();
 	}
 
 	void autopistol(CUserCmd* cmd);

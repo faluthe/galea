@@ -16,7 +16,14 @@ void features::esp::crosshair()
 	ifaces::surface->DrawLine(x, y + 5, x, y - 5);
 }
 
-void features::esp::lerp_test()
+void features::esp::anti_flash()
 {
-	g::fonts::config.print(L"Lerp: " + std::to_wstring(lerp).substr(0, 5), 10, 30);
+	if (g::localplayer->valid_ptr())
+		g::localplayer->flash_alpha() = config::anti_flash;
+}
+
+void features::esp::restore_flash()
+{
+	if (g::localplayer->valid_ptr())
+		g::localplayer->flash_alpha() = 255.f;
 }

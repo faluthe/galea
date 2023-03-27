@@ -82,6 +82,7 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 	features::autopistol(cmd);
 	features::bunnyhop(cmd);
 	features::triggerbot(cmd);
+	features::esp::anti_flash();
 	features::backtrack::update_sequences();
 	features::backtrack::run(cmd);
 
@@ -133,8 +134,6 @@ static void __stdcall hkPaintTraverse(unsigned int vguiPanel, bool forceRepaint,
 		   only when the screen size is relevant. Fonts are also configured here,
 		   as the two are directly correlated */
 		g::get_screen_size();
-
-		features::esp::lerp_test();
 		
 		config::render();
 		config::render_watermark();
