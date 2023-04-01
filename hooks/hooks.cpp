@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <string>
+#include <Windows.h>
 
 #include "../sdk/classes/math/matrix.h"
 #include "../sdk/classes/entity/player.h"
@@ -7,6 +8,7 @@
 #include "../sdk/interfaces/interfaces.h"
 #include "../core/configuration/config.h"
 #include "../core/features.h"
+#include "../valve/checksum_md5.h"
 #include "minhook/MinHook.h"
 #include "hooks.h"
 
@@ -57,6 +59,15 @@ int __fastcall hkSendDatagram(CNetChan* netchan, void*, void* datagram)
 // Called once per tick in game
 static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 {
+	auto set_angles = oCreateMove(sampletime, cmd);
+	if (cmd == nullptr || cmd->command_number == 0)
+		return set_angles;
+
+	if (set_angles)
+		ifaces::engine->SetViewAngles(&cmd->viewangles);
+
+	cmd->random_seed = MD5_PseudoRandom(cmd->command_number) & 0x7fffffff;
+
 	// Remember, this function is only called in game!
 	static bool hooked = []() { sdk::debug::print("CreateMove hooked"); return true; } ();
 	static bool send_datagram_hook = []() {
@@ -71,10 +82,6 @@ static bool __stdcall hkCreateMove(float sampletime, CUserCmd* cmd)
 			throw std::runtime_error("Could not enable hook");
 		return true;
 	} ();
-
-	// Causing issues
-	/*if (cmd == nullptr || cmd->command_number == 0)
-		return oCreateMove(sampletime, cmd);*/
 
 	g::get_localplayer();
 	config::convars::set();
@@ -158,6 +165,12 @@ void hooks::init()
 
 	if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
 		throw std::runtime_error("Could not enable hooks");
+
+	// Return address checks hotfix
+	const char* game_modules[]{ "client.dll",  "engine.dll",  "server.dll",  "studiorender.dll", "materialsystem.dll",  "shaderapidx9.dll",  "vstdlib.dll", "vguimatsurface.dll" };
+	long long patch = 0x69690004C201B0;
+	for (auto current_module : game_modules)
+		WriteProcessMemory(GetCurrentProcess(), (LPVOID)sdk::helpers::pattern_scan(current_module, "55 8B EC 56 8B F1 33 C0 57 8B 7D 08"), &patch, 5, 0);
 }
 
 void hooks::restore_all()

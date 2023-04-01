@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include "../sdk/classes/math/vector.h"
 #include "../sdk/sdk.h"
 #include "INetChannelInfo.h"
 
@@ -12,6 +13,7 @@ struct IVEngineClient
 	VIRTUAL_METHOD(void, GetScreenSize, 5, (int& width, int& height), (this, std::ref(width), std::ref(height)))
 	// Returns index of localplayer in entity list
 	VIRTUAL_METHOD(int, GetLocalPlayer, 12, (), (this))
+	VIRTUAL_METHOD(void, SetViewAngles, 19, (Vector* va), (this, va))
 	VIRTUAL_METHOD(int, GetMaxClients, 20, (), (this))
 	VIRTUAL_METHOD(bool, IsInGame, 26, (), (this))
 	VIRTUAL_METHOD(INetChannelInfo*, GetNetChannelInfo, 78, (), (this))
